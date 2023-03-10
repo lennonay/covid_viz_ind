@@ -1,1 +1,3 @@
-# covid_viz_ind
+# COVID Visualization Dashboard
+
+The 
