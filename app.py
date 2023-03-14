@@ -3,6 +3,8 @@ from dash import html, dcc, Input, Output
 import altair as alt
 import dash_bootstrap_components as dbc
 import pandas as pd
+import plotly.graph_objs as go
+import plotly.express as px
 
 alt.data_transformers.enable('data_server')
 
@@ -31,7 +33,10 @@ def plot_cases(country, median_age, human_index):
     ).properties(
     width=800,
     height=280).interactive()
-    return chart.to_html()
+    fig = px.line(
+    df, x="date", y="total_cases")
+    return fig
+    #return chart.to_html()
 
 def plot_vaccinations(country, median_age, human_index):
     if (country != 'World'):
@@ -75,10 +80,10 @@ app.layout = dbc.Container([
                 'padding': 15,
                 'border-radius': 3}),
     dbc.Col([
-        html.Iframe(
+        dcc.Graph(
             id = 'total_cases',
-            srcDoc=plot_cases('World',[15,35],[0.3,1]),
-            style={'border-width': '0', 'width': '100%', 'height': '400px'}),
+            figure=plot_cases('World',[15,35],[0.3,1]),),
+            #style={'border-width': '0', 'width': '100%', 'height': '400px'}),
         html.Iframe(
             id = 'total_vaccinations',
             srcDoc=plot_vaccinations('World',[15,35],[0.3,1]),
@@ -87,7 +92,7 @@ app.layout = dbc.Container([
 
 # Set up callbacks/backend
 @app.callback(
-    Output('total_cases', 'srcDoc'),
+    Output('total_cases', 'figure'),
     Output('total_vaccinations', 'srcDoc'),
     Input('xcol', 'value'),
     Input('xslider', 'value'),
