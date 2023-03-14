@@ -34,7 +34,7 @@ def plot_cases(country, median_age, human_index):
     width=800,
     height=280).interactive()
     fig = px.line(
-    df, x="date", y="total_cases")
+    df, x="date", y="total_cases",labels = {'total_cases': 'Total Cases', 'date': 'Date'},title = 'Total cases over time')
     return fig
     #return chart.to_html()
 
@@ -52,7 +52,10 @@ def plot_vaccinations(country, median_age, human_index):
     ).properties(
     width=800,
     height=280).interactive()
-    return chart.to_html()
+    fig = px.line(
+    df, x="date", y="new_vaccinations_smoothed",labels = {'new_vaccinations_smoothed': 'New vaccinations smoothed', 'date': 'Date'},title = 'New vaccinations smoothed over time')
+    return fig
+    #return chart.to_html()
 
 
 app.layout = dbc.Container([
@@ -84,16 +87,16 @@ app.layout = dbc.Container([
             id = 'total_cases',
             figure=plot_cases('World',[15,35],[0.3,1]),),
             #style={'border-width': '0', 'width': '100%', 'height': '400px'}),
-        html.Iframe(
+        dcc.Graph(
             id = 'total_vaccinations',
-            srcDoc=plot_vaccinations('World',[15,35],[0.3,1]),
-            style={'border-width': '0', 'width': '100%', 'height': '400px'})
+            figure=plot_vaccinations('World',[15,35],[0.3,1]),)
+            #style={'border-width': '0', 'width': '100%', 'height': '400px'})
     ])])])
 
 # Set up callbacks/backend
 @app.callback(
     Output('total_cases', 'figure'),
-    Output('total_vaccinations', 'srcDoc'),
+    Output('total_vaccinations', 'figure'),
     Input('xcol', 'value'),
     Input('xslider', 'value'),
     Input('hslider','value')
