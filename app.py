@@ -57,7 +57,18 @@ def plot_vaccinations(country, median_age, human_index):
     return fig
     #return chart.to_html()
 
-
+def plot_stringency(country, median_age, human_index):
+    if (country != 'World'):
+        toal_case_plot = covid_data[covid_data['location'] == country]
+    else: toal_case_plot = covid_data
+    age_covid_data = toal_case_plot[(toal_case_plot['median_age'] > median_age[0] ) & (toal_case_plot['median_age'] < median_age[1])]
+    df = age_covid_data[(age_covid_data['human_development_index'] > human_index[0] ) & (age_covid_data['human_development_index'] < human_index[1])]
+    df = pd.DataFrame(df.groupby('location')['stringency_index'].mean().reset_index())
+    fig = px.choropleth(df, locations = 'location',locationmode= 'country names',
+              color = 'stringency_index', title = 'Mean stringency index of country')
+    #fig.update_layout(width=1000, height=600)
+    return fig
+    
 app.layout = dbc.Container([
     html.H1('COVID Dashboard',style={
                     'backgroundColor': 'steelblue',
@@ -84,6 +95,10 @@ app.layout = dbc.Container([
                 'border-radius': 3}),
     dbc.Col([
         dcc.Graph(
+            id = 'stringency',
+            figure = plot_stringency('World',[15,35],[0.3,1])
+        ),
+        dcc.Graph(
             id = 'total_cases',
             figure=plot_cases('World',[15,35],[0.3,1]),),
             #style={'border-width': '0', 'width': '100%', 'height': '400px'}),
@@ -97,13 +112,14 @@ app.layout = dbc.Container([
 @app.callback(
     Output('total_cases', 'figure'),
     Output('total_vaccinations', 'figure'),
+    Output('stringency', 'figure'),
     Input('xcol', 'value'),
     Input('xslider', 'value'),
     Input('hslider','value')
 )
 
 def update_output(xcol,xslider,hslider):
-    return plot_cases(xcol,xslider,hslider), plot_vaccinations(xcol,xslider,hslider)
+    return plot_cases(xcol,xslider,hslider), plot_vaccinations(xcol,xslider,hslider), plot_stringency(xcol,xslider,hslider)
 
 if __name__ == '__main__':
     app.run_server(debug=True)
