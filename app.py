@@ -10,7 +10,7 @@ alt.data_transformers.enable('data_server')
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-covid_data = pd.read_csv('data/processed/covid_data.csv')
+covid_data = pd.read_csv('data/covid_data.csv')
 covid_data['date'] = pd.to_datetime(covid_data['date'])
 covid_data = covid_data[(covid_data['continent']).notnull()]
 
